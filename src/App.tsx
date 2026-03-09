@@ -1,49 +1,62 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
   const [success, setSuccess] = useState(false);
-  const [particles, setParticles] = useState([
-    { char: "L", pos: 0 },
-    { char: "i", pos: 1 },
-    { char: "l", pos: 2 },
-    { char: "l", pos: 3 },
-    { char: "i", pos: 4 },
-  ]);
   const [history, setHistory] = useState<number[]>([]); // To store previous run counts
+  const [mode, setMode] = useState("Lilli"); // "Lilli" or "Intelligent Lilli"
+
+  const fullWord = mode === "Lilli" ? "Lilli" : "Intelligent Lilli";
+  const lettersArray = fullWord.split("");
+  const slotCount = lettersArray.length;
+
+  // Initialize particles based on the selected word
+  const [particles, setParticles] = useState(
+    lettersArray.map((char, i) => ({ char, pos: i })),
+  );
+
+  const reset = () => {
+    setCount(0);
+    setSuccess(false);
+    setParticles(lettersArray.map((char, i) => ({ char, pos: i })));
+  };
+
+  // Re-initialize when mode changes
+  useEffect(() => {
+    reset();
+  }, [mode]);
+
   const handleClick = () => {
     let next;
     if (count === 0) {
-      next = [
-        { char: "L", pos: 1 }, // moved from 0
-        { char: "i", pos: 0 }, // moved from 1
-        { char: "l", pos: 3 }, // moved from 2
-        { char: "l", pos: 2 }, // moved from 3
-        { char: "i", pos: 3 }, // moved from 4 (overlapping with 'l')
-      ];
+      // THE "EXPLOSION" STEP: Every particle moves 1 or 2 slots away
+      next = particles.map((p, i) => ({
+        ...p,
+        pos: Math.max(
+          0,
+          Math.min(slotCount - 1, i + (Math.random() > 0.5 ? 1 : -1)),
+        ),
+      }));
     } else {
       next = particles.map((p) => {
         const move = Math.random() > 0.5 ? 1 : -1;
-        // Calculate new position, constrained between slot 0 and 4
-        let newPos = p.pos + move;
-        if (newPos < 0) newPos = 0;
-        if (newPos > 4) newPos = 4;
-
-        return { ...p, pos: newPos };
+        return {
+          ...p,
+          pos: Math.max(0, Math.min(slotCount - 1, p.pos + move)),
+        };
       });
     }
+
     setParticles(next);
     const sortedNext = [...next].sort((a, b) => a.pos - b.pos);
 
-    const isOrdered = sortedNext.map((p) => p.char).join("") === "Lilli";
+    const isOrdered = sortedNext.map((p) => p.char).join("") === fullWord;
     if (isOrdered) {
       setSuccess(true);
       setHistory((prev) => [count + 1, ...prev]);
-    } else {
-      setSuccess(false);
     }
-    setCount((count) => count + 1);
+    setCount((prev) => prev + 1);
   };
 
   const sortedParticles = [...particles].sort((a, b) => a.pos - b.pos);
@@ -86,23 +99,19 @@ function App() {
       <div className="card">count is {count}</div>
       {success && (
         <div className="card">
-          <button
-            onClick={() => {
-              setCount(0);
-              setSuccess(false);
-              setParticles([
-                { char: "L", pos: 0 },
-                { char: "i", pos: 1 },
-                { char: "l", pos: 2 },
-                { char: "l", pos: 3 },
-                { char: "i", pos: 4 },
-              ]);
-            }}
-          >
-            Play again
-          </button>
+          <button onClick={reset}>Play again</button>
         </div>
       )}
+      <div className="card">
+        <button
+          onClick={() => {
+            setMode(mode === "Lilli" ? "Intelligent Lilli" : "Lilli");
+            setHistory([]);
+          }}
+        >
+          {mode === "Lilli" ? "Hard mode" : "Easy mode"}
+        </button>
+      </div>
       {history.length > 0 && (
         <div
           style={{
