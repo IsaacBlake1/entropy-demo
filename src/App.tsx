@@ -62,12 +62,22 @@ function App() {
   const sortedParticles = [...particles].sort((a, b) => a.pos - b.pos);
   return (
     <>
-      <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          gap: "2.5rem",
+          width: "100%",
+          justifyContent: "center",
+          marginBottom: "2rem",
+        }}
+      >
         <img src={"lilli-128-teal.png"} className="logo" alt="Lilli logo" />
+        <h1 style={{ color: success ? "#5de2d4" : "black", margin: 0 }}>
+          {success ? "Order Restored!" : "Arrange Lilli"}
+        </h1>
+        <div style={{ width: "50px" }} />
       </div>
-      <h1 style={{ color: success ? "#5de2d4" : "white" }}>
-        {success ? "Order Restored!" : "Arrange Lilli"}
-      </h1>
 
       <div
         style={{
@@ -76,13 +86,14 @@ function App() {
           gap: "1rem",
           minHeight: "4rem",
           alignItems: "center",
+          marginBottom: "1rem",
         }}
       >
         {sortedParticles.map((p, index) => (
           <div
             key={index}
             style={{
-              fontSize: "3rem",
+              fontSize: "5rem",
               fontWeight: "bold",
               transition: "all 0.2s ease", // Makes the 'walk' look smoother
             }}
@@ -95,14 +106,17 @@ function App() {
         <button onClick={handleClick} disabled={success}>
           Take a walk
         </button>
+        <div className="card">drunken walks: {count}</div>
       </div>
-      <div className="card">count is {count}</div>
-      {success && (
-        <div className="card">
-          <button onClick={reset}>Play again</button>
-        </div>
-      )}
-      <div className="card">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "1rem",
+          marginTop: "1rem",
+        }}
+      >
+        {success && <button onClick={reset}>Play again</button>}
         <button
           onClick={() => {
             setMode(mode === "Lilli" ? "Intelligent Lilli" : "Lilli");

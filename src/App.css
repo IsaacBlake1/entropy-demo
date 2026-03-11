@@ -3,13 +3,13 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  min-height: 100vh;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
+  height: 4em;
 }
 
 .card {
-  padding: 2em;
+  padding: 1em;
 }
